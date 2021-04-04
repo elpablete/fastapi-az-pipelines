@@ -1,0 +1,10 @@
+
+
+@authToken = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzMjQyMzUzMTIiLCJleHAiOjE2MjYyMzkwMjIsInVzZXIiOnsiaWQiOiIzMjQyMzUzMTIiLCJlbWFpbCI6Imp0YW1heW9AZXhhbXBsZS5jb20iLCJhbGlhcyI6InBhYmxldGUifSwic2NvcGVzIjpbInVzZXJzLm1lOnJlYWQiXX0.H7VPL5Nt2JCFBhU1junH9qzhuKOhX3ziln6zlcbyPLw
+# @name me
+GET /users/me HTTP/1.1
+Host: 127.0.0.1:8000
+Content-type: application/json
+Authorization: Bearer {{authToken}}
+###
+

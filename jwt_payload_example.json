@@ -1,0 +1,10 @@
+{
+    "sub": "324235312",
+    "exp": 1626239022,
+    "user": {
+        "id": "324235312",
+        "email": "jtamayo@example.com",
+        "alias": "pablete"
+    },
+    "scopes": ["users.me:read"]
+}

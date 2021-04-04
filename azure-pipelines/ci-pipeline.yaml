@@ -1,0 +1,80 @@
+pool:
+  vmImage: "ubuntu-latest"
+
+trigger: none
+
+variables:
+  - name: branch
+    value: $(Build.SourceBranchName)
+  - name: commit
+    value: $(Build.SourceVersion)
+
+jobs:
+  - job: test
+    
+    strategy:
+      matrix:
+        Python38:
+          python.version: "3.8"
+        Python39:
+          python.version: "3.9"
+
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: "$(python.version)"
+        displayName: "Use Python $(python.version)"
+
+      - script: |
+          python -m pip install --upgrade pip
+        displayName: "Upgrade pip"
+
+      - script: |
+          python -m pip install -r requirements.txt
+        displayName: "Install dependencies"
+
+      - script: |
+          python -m pip install -r requirements-dev.txt
+        displayName: "Install dev dependencies"
+
+      - script: |
+          python -m flake8 app
+        displayName: "flake8 app/"
+
+      # - script: |
+      #     python -m flake8 tests
+      #   displayName: "flake8 tests/"
+
+      - script: |
+          python -m mypy app
+        displayName: "mypy app/"
+
+      # - script: |
+      #     python -m mypy tests
+      #   displayName: "mypy tests/"
+
+      - script: |
+          pip install pytest-cov    
+          python -m pytest tests
+          pytest tests --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+        displayName: "pytest tests/"
+
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFiles: '**/test-*.xml'
+          testRunTitle: 'Publish test results for Python $(python.version)'
+
+      - task: PublishCodeCoverageResults@1
+        inputs:
+          codeCoverageTool: Cobertura
+          summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+          reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+
+  - job: Build Image
+
+    steps:
+      - task: Docker@2
+        displayName: Build an image
+        inputs:
+          command: build
